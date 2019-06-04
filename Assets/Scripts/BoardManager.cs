@@ -20,14 +20,14 @@ public class BoardManager : MonoBehaviour
 
 
 	// Use this for initialization
-	void Start ()
+	void Start()
 	{
 	    Instance = GetComponent<BoardManager>();
         CreateBoard();
 	}
 	
     // Update is called once per frame
-	void Update ()
+	void Update()
 	{
 		
 	}

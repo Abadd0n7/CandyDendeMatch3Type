@@ -4,58 +4,72 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-public class Tile : MonoBehaviour {
-	//private static Color selectedColor = new Color(.5f, .5f, .5f, 1.0f);
-	private static Tile previousSelected = null;
-    private Renderer rend;
-    private GameObject go;
-	private bool isSelected = false;
+public class Tile : MonoBehaviour
+{
+    private GameObject selectObject; // game obj
 
-	//private Vector2[] adjacentDirections = new Vector2[] { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+    void Start()
+    {
 
-	void Awake() {
-		go = GetComponent<GameObject>();
+    }
+    void Update()
+    {
+        //selectObject = GetComponent<GameObject>();
+        Move();
     }
 
-	private void Select() {
-		isSelected = true;
-		//go. = selectedColor;
-		previousSelected = gameObject.GetComponent<Tile>();
-		//SFXManager.instance.PlaySFX(Clip.Select);
-	}
-
-	private void Deselect() {
-		isSelected = false;
-		//go.color = Color.white;
-		previousSelected = null;
-	}
-    void OnMouseDown()
+    private void Move()
     {
-        // 1
-        if (go == null || BoardManager.Instance.IsShifting)
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
         {
-            Debug.Log(BoardManager.Instance.IsShifting.Equals(true));
-            return;
-        }
+            //Debug.Log("Działa.");
+            GameObject gameObject = hit.transform.root.gameObject;
 
-        if (isSelected)
-        { // 2 Is it already selected?
-            Deselect();
+            Select(gameObject);
         }
         else
         {
-            if (previousSelected == null)
-            { // 3 Is it the first tile selected?
-                Debug.Log(BoardManager.Instance.IsShifting.Equals(true));
-                Select();
-                Debug.Log(BoardManager.Instance.IsShifting.Equals(true));
-            }
-            else
+            Deselect();
+        }
+
+    }
+
+    void Select(GameObject obj)
+    {
+        if (selectObject != null)
+        {
+            if (obj == selectObject)
             {
-                Debug.Log(BoardManager.Instance.IsShifting.Equals(true));
-                previousSelected.Deselect(); // 4
-                Debug.Log(BoardManager.Instance.IsShifting.Equals(true));
+                return;
             }
+
+            Deselect();
+        }
+
+        selectObject = obj;
+
+        Renderer[] rend = selectObject.GetComponentsInChildren<Renderer>();
+        foreach(var r in rend)
+        {
+            Material m = r.material;
+            m.color = Color.red;
+            r.material = m;
+        }
+    }
+
+    void Deselect()
+    {
+        if (selectObject == null)
+            return;
+
+        Renderer[] rend = selectObject.GetComponentsInChildren<Renderer>();
+        foreach (var r in rend)
+        {
+            Material m = r.material;
+            m.color = Color.white;
+            r.material = m;
         }
     }
 }
